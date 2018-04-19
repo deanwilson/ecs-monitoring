@@ -18,3 +18,15 @@ an enable versioning on this bucket before you run any other commands.
 You will currently need to run `sed` over the codebase if you want to
 use a different bucket name.
 
+## Creating your environment
+
+Once you've created your environment, and tweaked the bucket name
+to suit your own bucket you can create the environment with:
+
+    cd terraform/projects/infra-networking
+
+    $ terraform init
+
+    $ terraform plan
+
+    $ terraform apply
