@@ -30,3 +30,14 @@ to suit your own bucket you can create the environment with:
     $ terraform plan
 
     $ terraform apply
+
+## Creating documentation
+
+The projects in this repo use the [terraform-docs](https://github.com/segmentio/terraform-docs)
+to generate the per project documentation.
+
+When adding a new project you should run
+
+    terraform-docs markdown . > index.md
+
+In the project directory and add that to your commit.
