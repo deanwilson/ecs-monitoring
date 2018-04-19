@@ -73,3 +73,8 @@ output "vpc_id" {
   value       = "${module.vpc.vpc_id}"
   description = "VPC ID where the stack resources are created"
 }
+
+output "private_subnets" {
+  value       = "${module.vpc.private_subnets}"
+  description = "List of private subnet IDs"
+}
