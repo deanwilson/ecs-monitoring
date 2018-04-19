@@ -65,3 +65,11 @@ module "vpc" {
     Stack       = "${var.stack_name}"
   }
 }
+
+
+## Outputs
+
+output "vpc_id" {
+  value       = "${module.vpc.vpc_id}"
+  description = "VPC ID where the stack resources are created"
+}
