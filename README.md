@@ -39,6 +39,10 @@ to suit your own bucket you can create the environment with:
 
     # terraform commands from above
 
+    cd ../app-ecs-albs
+
+    # terraform commands from above
+
 ## Creating documentation
 
 The projects in this repo use the [terraform-docs](https://github.com/segmentio/terraform-docs)
