@@ -99,7 +99,12 @@ module "ecs-node-1" {
   user_data = <<EOF
 #!/bin/bash
 # Set any ECS agent configuration options
-echo 'ECS_CLUSTER=dwilson-ecs-monitoring' >> /etc/ecs/ecs.config
+yum install -y ecs-init
+start ecs
+service docker start
+
+#echo 'ECS_CLUSTER=dwilson-ecs-monitoring' >> /etc/ecs/ecs.config
+echo 'ECS_CLUSTER=default' >> /etc/ecs/ecs.config
 EOF
 
   # Auto scaling group
