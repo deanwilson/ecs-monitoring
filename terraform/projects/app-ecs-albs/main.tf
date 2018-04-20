@@ -129,3 +129,7 @@ resource "aws_lb_listener" "monitoring_external" {
 
 ## Outputs
 
+output "monitoring_external_tg" {
+  value       = "${aws_lb_target_group.monitoring_external_tg.arn}"
+  description = "External Monitoring ALB target group"
+}
