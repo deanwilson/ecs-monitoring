@@ -35,6 +35,10 @@ to suit your own bucket you can create the environment with:
 
     # terraform commands from above
 
+    cd ../app-ecs-nodes
+
+    # terraform commands from above
+
 ## Creating documentation
 
 The projects in this repo use the [terraform-docs](https://github.com/segmentio/terraform-docs)
@@ -45,3 +49,12 @@ When adding a new project you should run
     terraform-docs markdown . > index.md
 
 In the project directory and add that to your commit.
+
+## ECS
+
+### Newest ECS AMI
+
+To see the latest ECS Optimized Amazon Linux AMI information in your
+default region, run this AWS CLI command:
+
+    aws ssm get-parameters --names /aws/service/ecs/optimized-ami/amazon-linux/recommended
