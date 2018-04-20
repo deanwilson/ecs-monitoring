@@ -81,8 +81,19 @@ data "terraform_remote_state" "app_ecs_albs" {
 ## Resources
 
 resource "aws_ecs_task_definition" "base_nginx" {
-  family                = "service"
+  family                = "nginx"
   container_definitions = "${file("task-definitions/base-nginx.json")}"
+
+  volume {
+    name      = "external-config-password"
+    host_path = "/ecs/pulled-config/nginx/.htpasswd"
+  }
+
+  volume {
+    name      = "external-config-default"
+    host_path = "/ecs/pulled-config/nginx/default"
+  }
+
 }
 
 resource "aws_ecs_service" "nginx" {
