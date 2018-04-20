@@ -78,7 +78,7 @@ module "ecs-node-1" {
 
   name = "${var.stack_name}-ecs-node-1-"
 
-  key_name = "dwilson-test" # TODO - Param
+  key_name = "ecs-monitoring" # TODO - Param
 
   # Launch configuration
   lc_name = "${var.stack_name}-ecs-node-1-"
