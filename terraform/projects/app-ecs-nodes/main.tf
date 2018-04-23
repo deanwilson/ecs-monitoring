@@ -11,6 +11,30 @@ variable "aws_region" {
   default     = "eu-west-1"
 }
 
+variable "ecs_image_id" {
+  type        = "string"
+  description = "AMI ID to use for the ECS nodes"
+  default     = "ami-2d386654"
+}
+
+variable "ecs_instance_type" {
+  type        = "string"
+  description = "ECS Node instance type"
+  default     = "t2.micro"
+}
+
+variable "ecs_instance_root_size" {
+  type        = "string"
+  description = "ECS instance root volume size - in GB""
+  default     = "50"
+}
+
+variable "ecs_instance_ssh_keyname" {
+  type        = "string"
+  description = "SSH keyname for ECS instances"
+  default     = "ecs-monitoring"
+}
+
 variable "remote_state_bucket" {
   type        = "string"
   description = "S3 bucket we store our terraform state in"
@@ -78,20 +102,19 @@ module "ecs-node-1" {
 
   name = "${var.stack_name}-ecs-node-1-"
 
-  key_name = "ecs-monitoring" # TODO - Param
+  key_name = "${var.ecs_instance_ssh_keyname}"
 
   # Launch configuration
   lc_name = "${var.stack_name}-ecs-node-1-"
 
-  image_id        = "ami-2d386654" # TODO - Param
-  instance_type   = "t2.micro" # TODO - Param
+  image_id        = "${var.ecs_image_id}"
+  instance_type   = "${var.ecs_instance_type}"
   security_groups = ["${data.terraform_remote_state.infra_security_groups.monitoring_internal_sg_id}"]
-  #iam_instance_profile = "ecs-node-policy"
   iam_instance_profile = "${var.stack_name}-ecs-profile"
 
   root_block_device = [
     {
-      volume_size = "50" # TODO - Param
+      volume_size = "${var.ecs_instance_root_size}"
       volume_type = "gp2"
     },
   ]
