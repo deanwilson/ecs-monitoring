@@ -25,7 +25,7 @@ to suit your own bucket you can create the environment with:
 
     cd terraform/projects/infra-networking
 
-    $ terraform init
+    $ terraform init -backend-config=../../../environments/dwilson-staging.backend
 
     $ terraform plan
 
