@@ -42,9 +42,7 @@ terraform {
   required_version = "= 0.11.7"
 
   backend "s3" {
-    bucket = "deanwilson-ecs-monitoring"
-    key    = "infra-security-groups.tfstate"
-    region = "eu-west-1"
+    key = "infra-security-groups.tfstate"
   }
 }
 

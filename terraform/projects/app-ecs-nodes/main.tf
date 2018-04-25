@@ -62,9 +62,7 @@ terraform {
   required_version = "= 0.11.7"
 
   backend "s3" {
-    bucket = "deanwilson-ecs-monitoring"
-    key    = "app-ecs-nodes.tfstate"
-    region = "eu-west-1"
+    key = "app-ecs-nodes.tfstate"
   }
 }
 
