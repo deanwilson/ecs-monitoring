@@ -126,12 +126,12 @@ resource "null_resource" "node_autoscaling_group_tags" {
 module "ecs-node-1" {
   source = "terraform-aws-modules/autoscaling/aws"
 
-  name = "${var.stack_name}-ecs-node-1-"
+  name = "${var.stack_name}-ecs-node-1"
 
   key_name = "${var.ecs_instance_ssh_keyname}"
 
   # Launch configuration
-  lc_name = "${var.stack_name}-ecs-node-1-"
+  lc_name = "${var.stack_name}-ecs-node-1"
 
   image_id        = "${var.ecs_image_id}"
   instance_type   = "${var.ecs_instance_type}"
@@ -157,7 +157,7 @@ echo 'ECS_CLUSTER=default' >> /etc/ecs/ecs.config
 EOF
 
   # Auto scaling group
-  asg_name                  = "${var.stack_name}-ecs-node-1-"
+  asg_name                  = "${var.stack_name}-ecs-node-1"
   vpc_zone_identifier       = ["${element(data.terraform_remote_state.infra_networking.private_subnets, 1)}"]
   health_check_type         = "EC2"
   min_size                  = 1
