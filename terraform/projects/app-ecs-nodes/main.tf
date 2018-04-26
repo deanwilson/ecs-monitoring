@@ -166,8 +166,8 @@ EOF
   wait_for_capacity_timeout = 0
 
   tags = ["${concat(
-    list(map("key", "Name", "value", "${var.name}", "propagate_at_launch", true)),
     null_resource.node_autoscaling_group_tags.*.triggers)
+    # list(default_tags, "propagate_at_launch", true) # TODO - add local tags
   }"]
 
 }
