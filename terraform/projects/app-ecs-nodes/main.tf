@@ -5,6 +5,12 @@
 *
 */
 
+variable "additional_tags" {
+  type        = "map"
+  description = "Stack specific tags to apply"
+  default     = {}
+}
+
 variable "aws_region" {
   type        = "string"
   description = "AWS region"
@@ -25,7 +31,7 @@ variable "ecs_instance_type" {
 
 variable "ecs_instance_root_size" {
   type        = "string"
-  description = "ECS instance root volume size - in GB""
+  description = "ECS instance root volume size - in GB"
   default     = "50"
 }
 
@@ -51,6 +57,18 @@ variable "stack_name" {
   type        = "string"
   description = "Unique name for this collection of resources"
   default     = "dwilson-ecs-monitoring"
+}
+
+# locals
+# --------------------------------------------------------------
+
+locals {
+
+  default_tags = {
+    Terraform  = "true"
+    "Project"  = "app-ecs-nodes"
+  }
+
 }
 
 # Resources
@@ -95,6 +113,16 @@ data "terraform_remote_state" "infra_security_groups" {
 
 ## Resources
 
+resource "null_resource" "node_autoscaling_group_tags" {
+  count = "${length(keys(var.default_tags))}"
+
+  triggers {
+    key                 = "${element(keys(var.default_tags), count.index)}"
+    value               = "${element(values(var.default_tags), count.index)}"
+    propagate_at_launch = true
+  }
+}
+
 module "ecs-node-1" {
   source = "terraform-aws-modules/autoscaling/aws"
 
@@ -137,34 +165,10 @@ EOF
   desired_capacity          = 1
   wait_for_capacity_timeout = 0
 
-  tags = [
-    {
-      key                 = "Terraform"
-      value               = "true"
-      propagate_at_launch = true
-    },
-    {
-      key                 = "Project"
-      value               = "app-ecs-nodes"
-      propagate_at_launch = true
-    },
-    {
-      key                 = "Environment"
-      value               = "testing"
-      propagate_at_launch = true
-    },
-    {
-      key                 = "Owner"
-      value               = "dwilson"
-      propagate_at_launch = true
-    },
-    {
-      key                 = "Stack"
-      value               = "${var.stack_name}"
-      propagate_at_launch = true
-    },
-
-  ]
+  tags = ["${concat(
+    list(map("key", "Name", "value", "${var.name}", "propagate_at_launch", true)),
+    null_resource.node_autoscaling_group_tags.*.triggers)
+  }"]
 
 }
 
