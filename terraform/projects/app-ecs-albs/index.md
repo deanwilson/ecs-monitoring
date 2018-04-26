@@ -14,3 +14,9 @@ This may be merged back in to the nodes project
 | remote_state_bucket | S3 bucket we store our terraform state in | string | `deanwilson-ecs-monitoring` | no |
 | stack_name | Unique name for this collection of resources | string | `dwilson-ecs-monitoring` | no |
 
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| monitoring_external_tg | External Monitoring ALB target group |
+
