@@ -1,0 +1,39 @@
+
+### Cluster name
+
+Use a stack specific, non-default, cluster name
+
+### Bucket names
+
+Require a bucketname in a vars file to ensure they are distinct.
+
+### Tags
+
+In the ASG module wrapper add the local variables to the null resource that adds
+the tags. They are not currently being added.
+
+Check for hard coded tag values on resources. All should be `local` or via additional_tags
+
+### Size
+
+Make the instance bigger
+
+
+## Modules
+
+### RDS Module
+
+We are not using the [Terraform RDS module](https://registry.terraform.io/modules/terraform-aws-modules/rds/aws/1.15.0)
+due to the [Can't pass an already existing db_subnet_group](https://github.com/terraform-aws-modules/terraform-aws-rds/issues/48#issuecomment-374250014)
+issue. Instead we will use our own code.
+
+## SG module
+
+Rewrite it to use base SG resources for the same reason as above. You can
+only add one instance of the module on each run otherwise you hit the count issue.
+
+## Services
+
+### Node exporter
+
+https://forums.aws.amazon.com/thread.jspa?threadID=261608

@@ -5,10 +5,40 @@
 *
 */
 
+variable "additional_tags" {
+  type        = "map"
+  description = "Stack specific tags to apply"
+  default     = {}
+}
+
 variable "aws_region" {
   type        = "string"
   description = "AWS region"
   default     = "eu-west-1"
+}
+
+variable "ecs_image_id" {
+  type        = "string"
+  description = "AMI ID to use for the ECS nodes"
+  default     = "ami-2d386654"
+}
+
+variable "ecs_instance_type" {
+  type        = "string"
+  description = "ECS Node instance type"
+  default     = "t2.micro"
+}
+
+variable "ecs_instance_root_size" {
+  type        = "string"
+  description = "ECS instance root volume size - in GB"
+  default     = "50"
+}
+
+variable "ecs_instance_ssh_keyname" {
+  type        = "string"
+  description = "SSH keyname for ECS instances"
+  default     = "ecs-monitoring"
 }
 
 variable "remote_state_bucket" {
@@ -29,6 +59,18 @@ variable "stack_name" {
   default     = "dwilson-ecs-monitoring"
 }
 
+# locals
+# --------------------------------------------------------------
+
+locals {
+
+  default_tags = {
+    Terraform  = "true"
+    "Project"  = "app-ecs-nodes"
+  }
+
+}
+
 # Resources
 # --------------------------------------------------------------
 
@@ -38,9 +80,7 @@ terraform {
   required_version = "= 0.11.7"
 
   backend "s3" {
-    bucket = "deanwilson-ecs-monitoring"
-    key    = "app-ecs-nodes.tfstate"
-    region = "eu-west-1"
+    key = "app-ecs-nodes.tfstate"
   }
 }
 
@@ -73,25 +113,34 @@ data "terraform_remote_state" "infra_security_groups" {
 
 ## Resources
 
+resource "null_resource" "node_autoscaling_group_tags" {
+  count = "${length(keys(var.additional_tags))}"
+
+  triggers {
+    key                 = "${element(keys(var.additional_tags), count.index)}"
+    value               = "${element(values(var.additional_tags), count.index)}"
+    propagate_at_launch = true
+  }
+}
+
 module "ecs-node-1" {
   source = "terraform-aws-modules/autoscaling/aws"
 
-  name = "${var.stack_name}-ecs-node-1-"
+  name = "${var.stack_name}-ecs-node-1"
 
-  key_name = "ecs-monitoring" # TODO - Param
+  key_name = "${var.ecs_instance_ssh_keyname}"
 
   # Launch configuration
-  lc_name = "${var.stack_name}-ecs-node-1-"
+  lc_name = "${var.stack_name}-ecs-node-1"
 
-  image_id        = "ami-2d386654" # TODO - Param
-  instance_type   = "t2.micro" # TODO - Param
+  image_id        = "${var.ecs_image_id}"
+  instance_type   = "${var.ecs_instance_type}"
   security_groups = ["${data.terraform_remote_state.infra_security_groups.monitoring_internal_sg_id}"]
-  #iam_instance_profile = "ecs-node-policy"
   iam_instance_profile = "${var.stack_name}-ecs-profile"
 
   root_block_device = [
     {
-      volume_size = "50" # TODO - Param
+      volume_size = "${var.ecs_instance_root_size}"
       volume_type = "gp2"
     },
   ]
@@ -108,7 +157,7 @@ echo 'ECS_CLUSTER=default' >> /etc/ecs/ecs.config
 EOF
 
   # Auto scaling group
-  asg_name                  = "${var.stack_name}-ecs-node-1-"
+  asg_name                  = "${var.stack_name}-ecs-node-1"
   vpc_zone_identifier       = ["${element(data.terraform_remote_state.infra_networking.private_subnets, 1)}"]
   health_check_type         = "EC2"
   min_size                  = 1
@@ -116,34 +165,10 @@ EOF
   desired_capacity          = 1
   wait_for_capacity_timeout = 0
 
-  tags = [
-    {
-      key                 = "Terraform"
-      value               = "true"
-      propagate_at_launch = true
-    },
-    {
-      key                 = "Project"
-      value               = "app-ecs-nodes"
-      propagate_at_launch = true
-    },
-    {
-      key                 = "Environment"
-      value               = "testing"
-      propagate_at_launch = true
-    },
-    {
-      key                 = "Owner"
-      value               = "dwilson"
-      propagate_at_launch = true
-    },
-    {
-      key                 = "Stack"
-      value               = "${var.stack_name}"
-      propagate_at_launch = true
-    },
-
-  ]
+  tags = ["${concat(
+    null_resource.node_autoscaling_group_tags.*.triggers)
+    # list(default_tags, "propagate_at_launch", true) # TODO - add local tags
+  }"]
 
 }
 

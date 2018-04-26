@@ -4,8 +4,8 @@ An AWS ECS based monitoring stack - learning repo - not for prod
 
 ## Set up your environment
 
-This experiment repo assumes you are storing your state in an S3 bucket. Create
-an enable versioning on this bucket before you run any other commands.
+This experimental repo assumes you are storing your state in an S3 bucket. Create
+and enable versioning on this bucket before you run any other commands.
 
     export TERRAFORM_BUCKET=deanwilson-ecs-monitoring
 
@@ -18,6 +18,10 @@ an enable versioning on this bucket before you run any other commands.
 You will currently need to run `sed` over the codebase if you want to
 use a different bucket name.
 
+Now you have a bucketname you will create the configurarion for your stack. Inside
+the `environments` directory you will find a pair of files for each stack, a `.backend`
+and a `.tfvars`. Make a copy of an existing pair and change the values to suit your new name.
+
 ## Creating your environment
 
 Once you've created your environment, and tweaked the bucket name
@@ -25,11 +29,11 @@ to suit your own bucket you can create the environment with:
 
     cd terraform/projects/infra-networking
 
-    $ terraform init
+    $ terraform init -backend-config=../../../environments/dwilson-staging.backend
 
-    $ terraform plan
+    $ terraform plan -var-file=./../../environments/dwilson-staging.tfvars
 
-    $ terraform apply
+    $ terraform apply -var-file=./../../environments/dwilson-staging.tfvars
 
     cd ../infra-security-groups
 
