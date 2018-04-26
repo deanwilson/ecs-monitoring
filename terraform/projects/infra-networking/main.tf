@@ -6,6 +6,12 @@
 *
 */
 
+variable "additional_tags" {
+  type        = "map"
+  description = "Stack specific tags to apply"
+  default     = {}
+}
+
 variable "aws_region" {
   type        = "string"
   description = "AWS region"
@@ -16,6 +22,18 @@ variable "stack_name" {
   type        = "string"
   description = "Unique name for this collection of resources"
   default     = "dwilson-ecs-monitoring"
+}
+
+
+# locals
+# --------------------------------------------------------------
+
+locals {
+
+  default_tags = {
+    Terraform   = "true"
+  }
+
 }
 
 # Resources
@@ -56,12 +74,12 @@ module "vpc" {
 
   enable_nat_gateway = true
 
-  tags = {
-    Terraform   = "true"
-    Environment = "testing"
-    Owner       = "dwilson"
-    Stack       = "${var.stack_name}"
-  }
+  tags = "${merge(
+    local.default_tags,
+    var.additional_tags,
+    map("Stackname", var.stack_name)
+  )}"
+
 }
 
 
