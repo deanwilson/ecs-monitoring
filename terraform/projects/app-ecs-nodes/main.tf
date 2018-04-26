@@ -114,11 +114,11 @@ data "terraform_remote_state" "infra_security_groups" {
 ## Resources
 
 resource "null_resource" "node_autoscaling_group_tags" {
-  count = "${length(keys(var.default_tags))}"
+  count = "${length(keys(var.additional_tags))}"
 
   triggers {
-    key                 = "${element(keys(var.default_tags), count.index)}"
-    value               = "${element(values(var.default_tags), count.index)}"
+    key                 = "${element(keys(var.additional_tags), count.index)}"
+    value               = "${element(values(var.additional_tags), count.index)}"
     propagate_at_launch = true
   }
 }
