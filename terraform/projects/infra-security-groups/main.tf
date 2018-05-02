@@ -65,88 +65,83 @@ data "terraform_remote_state" "infra_networking" {
 
 ## Resources
 
-module "monitoring_external_sg" {
-  source = "terraform-aws-modules/security-group/aws"
+### External SG
 
+resource "aws_security_group" "monitoring_external_sg" {
   name        = "${var.stack_name}-monitoring_external_sg"
+  vpc_id      = "${data.terraform_remote_state.infra_networking.vpc_id}"
   description = "Controls external access to the monitoring instances"
-  vpc_id      = "${data.terraform_remote_state.infra_networking.vpc_id}"
-
-  ingress_with_cidr_blocks = [
-    {
-      from_port   = 80
-      to_port     = 80
-      protocol    = "tcp"
-      description = "HTTP in from everyone"
-      cidr_blocks = "0.0.0.0/0"
-    }
-  ]
-
-  egress_with_cidr_blocks = [
-    {
-      from_port   = 0
-      to_port     = 0
-      protocol    = "ALL"
-      description = "Allow all egress"
-      cidr_blocks = "0.0.0.0/0"
-    }
-  ]
-
 
   tags = {
     Terraform   = "true"
     Environment = "testing"
-    Owner       = "dwilson"
+    Owner       = "dwilson"               # TODO
     Stack       = "${var.stack_name}"
     Project     = "infra-security-groups"
   }
 }
 
-module "monitoring_internal_sg" {
-  source = "terraform-aws-modules/security-group/aws"
+resource "aws_security_group_rule" "monitoring_external_sg_ingress_any_http" {
+  type              = "ingress"
+  to_port           = 80
+  from_port         = 80
+  protocol          = "tcp"
+  security_group_id = "${aws_security_group.monitoring_external_sg.id}"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
 
+resource "aws_security_group_rule" "monitoring_external_sg_egress_any_any" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.monitoring_external_sg.id}"
+}
+
+### Internal SG
+
+resource "aws_security_group" "monitoring_internal_sg" {
   name        = "${var.stack_name}-monitoring_internal_sg"
-  description = "Controls access to the monitoring instances from the LBs"
   vpc_id      = "${data.terraform_remote_state.infra_networking.vpc_id}"
-
-  ingress_with_source_security_group_id = [
-    {
-      from_port   = 80
-      to_port     = 80
-      protocol    = "tcp"
-      description = "HTTP in from LBs"
-      source_security_group_id = "${module.monitoring_external_sg.this_security_group_id}"
-    }
-  ]
-
-  egress_with_cidr_blocks = [
-    {
-      from_port   = 0
-      to_port     = 0
-      protocol    = "ALL"
-      description = "Allow all egress"
-      cidr_blocks = "0.0.0.0/0"
-    }
-  ]
+  description = "Controls access to the monitoring instances from the LBs"
 
   tags = {
     Terraform   = "true"
     Environment = "testing"
-    Owner       = "dwilson"
+    Owner       = "dwilson"               # TODO
     Stack       = "${var.stack_name}"
     Project     = "infra-security-groups"
   }
 }
 
+resource "aws_security_group_rule" "monitoring_internal_sg_ingress_alb_http" {
+  type      = "ingress"
+  from_port = 80
+  to_port   = 80
+  protocol  = "tcp"
+
+  security_group_id        = "${aws_security_group.monitoring_internal_sg.id}"
+  source_security_group_id = "${aws_security_group.monitoring_external_sg.id}"
+}
+
+resource "aws_security_group_rule" "monitoring_internal_sg_egress_any_any" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.monitoring_internal_sg.id}"
+}
 
 ## Outputs
 
 output "monitoring_external_sg_id" {
-  value       = "${module.monitoring_external_sg.this_security_group_id}"
+  value       = "${aws_security_group.monitoring_external_sg.id}"
   description = "monitoring_external_sg ID"
 }
 
 output "monitoring_internal_sg_id" {
-  value       = "${module.monitoring_internal_sg.this_security_group_id}"
+  value       = "${aws_security_group.monitoring_internal_sg.id}"
   description = "monitoring_internal_sg ID"
 }
