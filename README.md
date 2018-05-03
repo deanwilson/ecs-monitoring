@@ -58,7 +58,7 @@ to generate the per project documentation.
 
 When adding a new project you should run
 
-    terraform-docs markdown . > index.md
+    terraform-docs markdown . > readme.md
 
 In the project directory and add that to your commit.
 
