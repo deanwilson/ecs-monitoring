@@ -26,9 +26,7 @@ variable "stack_name" {
 }
 
 locals {
-
   cluster_name = "${var.stack_name}-ecs-monitoring"
-
 }
 
 # Resources
@@ -71,7 +69,6 @@ data "terraform_remote_state" "infra_service_discovery" {
   }
 }
 
-
 data "terraform_remote_state" "infra_security_groups" {
   backend = "s3"
 
@@ -91,7 +88,6 @@ data "terraform_remote_state" "app_ecs_albs" {
     region = "${var.aws_region}"
   }
 }
-
 
 ## Resources
 
