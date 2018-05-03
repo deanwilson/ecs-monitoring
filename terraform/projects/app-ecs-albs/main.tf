@@ -7,6 +7,12 @@
 *
 */
 
+variable "additional_tags" {
+  type        = "map"
+  description = "Stack specific tags to apply"
+  default     = {}
+}
+
 variable "aws_region" {
   type        = "string"
   description = "AWS region"
@@ -16,13 +22,25 @@ variable "aws_region" {
 variable "remote_state_bucket" {
   type        = "string"
   description = "S3 bucket we store our terraform state in"
-  default     = "deanwilson-ecs-monitoring"
+  default     = "ecs-monitoring"
 }
 
 variable "stack_name" {
   type        = "string"
   description = "Unique name for this collection of resources"
-  default     = "dwilson-ecs-monitoring"
+  default     = "ecs-monitoring"
+}
+
+# locals
+# --------------------------------------------------------------
+
+locals {
+
+  default_tags = {
+    Terraform = "true"
+    Project   = "app-ecs-albs"
+  }
+
 }
 
 # Resources
@@ -84,12 +102,13 @@ resource "aws_lb" "monitoring_external_alb" {
   /*   enabled = true */
   /* } */
 
-  tags = {
-    Terraform   = "true"
-    Environment = "testing"
-    Owner       = "dwilson"
-    Stack       = "${var.stack_name}"
-  }
+  tags = "${merge(
+    local.default_tags,
+    var.additional_tags,
+    map("Stackname", "${var.stack_name}"),
+    map("Name", "${var.stack_name}-ecs-monitoring")
+  )}"
+
 }
 
 resource "aws_lb_target_group" "monitoring_external_tg" {
@@ -97,7 +116,6 @@ resource "aws_lb_target_group" "monitoring_external_tg" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = "${data.terraform_remote_state.infra_networking.vpc_id}"
-  # TODO Add health check on
 
   health_check {
     interval            = "10"
