@@ -70,27 +70,45 @@ data "terraform_remote_state" "infra_networking" {
 
 
 resource "aws_service_discovery_private_dns_namespace" "prometheus" {
-  name = "sd.ecs-monitoring.com"
+  name        = "sd.ecs-monitoring.com"
   description = "ECS Monitoring service discovery zone"
-  vpc = "${data.terraform_remote_state.infra_networking.vpc_id}"
+  vpc         = "${data.terraform_remote_state.infra_networking.vpc_id}"
 }
 
 
-resource "aws_service_discovery_service" "prometheus" {
-  name = "prometheus-service-discovery"
+resource "aws_service_discovery_service" "prometheus_server" {
+  name = "prometheus_server"
 
   dns_config {
     namespace_id = "${aws_service_discovery_private_dns_namespace.prometheus.id}"
     dns_records {
-      ttl = 10
+      ttl  = 10
       type = "A"
     }
   }
 }
 
+resource "aws_service_discovery_service" "prometheus_blackbox" {
+  name = "prometheus_blackbox"
+
+  dns_config {
+    namespace_id = "${aws_service_discovery_private_dns_namespace.prometheus.id}"
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+  }
+}
+
+
 ## Outputs
 
-output "service_discovery_arn" {
-  value       = "${aws_service_discovery_service.prometheus.arn}"
-  description = "Service Discovery ARN"
+output "prometheus_server_discovery_arn" {
+  value       = "${aws_service_discovery_service.prometheus_server.arn}"
+  description = "Prometheus server service discovery ARN"
+}
+
+output "prometheus_blackbox_discovery_arn" {
+  value       = "${aws_service_discovery_service.prometheus_blackbox.arn}"
+  description = "Prometheus server service discovery ARN"
 }

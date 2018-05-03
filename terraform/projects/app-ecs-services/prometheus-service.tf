@@ -21,7 +21,7 @@ resource "aws_ecs_service" "prometheus_server" {
   desired_count   = 1
 
   service_registries {
-    registry_arn = "${data.terraform_remote_state.infra_service_discovery.service_discovery_arn}"
+    registry_arn = "${data.terraform_remote_state.infra_service_discovery.prometheus_server_discovery_arn}"
   }
 
   network_configuration {
