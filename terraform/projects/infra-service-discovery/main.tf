@@ -74,8 +74,9 @@ resource "aws_service_discovery_private_dns_namespace" "prometheus" {
   vpc         = "${data.terraform_remote_state.infra_networking.vpc_id}"
 }
 
+# TODO: move these resources to the app-ecs-services project
 resource "aws_service_discovery_service" "prometheus_server" {
-  name = "prometheus_server"
+  name = "prometheus-server"
 
   dns_config {
     namespace_id = "${aws_service_discovery_private_dns_namespace.prometheus.id}"
@@ -87,8 +88,9 @@ resource "aws_service_discovery_service" "prometheus_server" {
   }
 }
 
+# TODO: move these resources to the app-ecs-services project
 resource "aws_service_discovery_service" "prometheus_blackbox" {
-  name = "prometheus_blackbox"
+  name = "prometheus-blackbox"
 
   dns_config {
     namespace_id = "${aws_service_discovery_private_dns_namespace.prometheus.id}"
@@ -100,6 +102,24 @@ resource "aws_service_discovery_service" "prometheus_blackbox" {
   }
 }
 
+<<<<<<< HEAD
+=======
+# TODO: move these resources to the app-ecs-services project
+resource "aws_service_discovery_service" "metrics_nginx" {
+  name = "metrics-nginx"
+
+  dns_config {
+    namespace_id = "${aws_service_discovery_private_dns_namespace.prometheus.id}"
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+  }
+}
+
+
+
+>>>>>>> 18254e9... Extract the metrics nginx and add a service record for it
 ## Outputs
 
 output "prometheus_server_discovery_arn" {
@@ -110,4 +130,9 @@ output "prometheus_server_discovery_arn" {
 output "prometheus_blackbox_discovery_arn" {
   value       = "${aws_service_discovery_service.prometheus_blackbox.arn}"
   description = "Prometheus server service discovery ARN"
+}
+
+output "metrics_nginx_discovery_arn" {
+  value       = "${aws_service_discovery_service.metrics_nginx.arn}"
+  description = "Metrics Nginx server service discovery ARN"
 }
