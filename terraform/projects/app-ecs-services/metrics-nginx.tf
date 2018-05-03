@@ -1,6 +1,6 @@
 
 resource "aws_ecs_task_definition" "metrics_nginx" {
-  family                = "nginx"
+  family                = "metrics-nginx"
   network_mode          = "awsvpc"
   container_definitions = "${file("task-definitions/metrics-nginx.json")}"
 
