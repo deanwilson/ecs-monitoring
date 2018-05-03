@@ -9,6 +9,12 @@
 *
 */
 
+variable "additional_tags" {
+  type        = "map"
+  description = "Stack specific tags to apply"
+  default     = {}
+}
+
 variable "aws_region" {
   type        = "string"
   description = "AWS region"
@@ -32,6 +38,16 @@ variable "stack_name" {
   description = "Unique name for this collection of resources"
   default     = "dwilson-ecs-monitoring"
 }
+
+locals {
+
+  default_tags = {
+    Terraform = "true"
+    Project   = "infra-security-groups"
+  }
+
+}
+
 
 # Resources
 # --------------------------------------------------------------
@@ -72,13 +88,13 @@ resource "aws_security_group" "monitoring_external_sg" {
   vpc_id      = "${data.terraform_remote_state.infra_networking.vpc_id}"
   description = "Controls external access to the monitoring instances"
 
-  tags = {
-    Terraform   = "true"
-    Environment = "testing"
-    Owner       = "dwilson"               # TODO
-    Stack       = "${var.stack_name}"
-    Project     = "infra-security-groups"
-  }
+  tags = "${merge(
+    local.default_tags,
+    var.additional_tags,
+    map("Stackname", "${var.stack_name}"),
+    map("Name", "${var.stack_name}-ecs-monitoring")
+  )}"
+
 }
 
 resource "aws_security_group_rule" "monitoring_external_sg_ingress_any_http" {
@@ -106,13 +122,13 @@ resource "aws_security_group" "monitoring_internal_sg" {
   vpc_id      = "${data.terraform_remote_state.infra_networking.vpc_id}"
   description = "Controls access to the monitoring instances from the LBs"
 
-  tags = {
-    Terraform   = "true"
-    Environment = "testing"
-    Owner       = "dwilson"               # TODO
-    Stack       = "${var.stack_name}"
-    Project     = "infra-security-groups"
-  }
+  tags = "${merge(
+    local.default_tags,
+    var.additional_tags,
+    map("Stackname", "${var.stack_name}"),
+    map("Name", "${var.stack_name}-ecs-monitoring")
+  )}"
+
 }
 
 resource "aws_security_group_rule" "monitoring_internal_sg_ingress_alb_http" {
