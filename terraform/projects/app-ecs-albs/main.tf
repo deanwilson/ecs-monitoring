@@ -117,7 +117,7 @@ resource "aws_lb_target_group" "monitoring_external_tg" {
 
   health_check {
     interval            = "10"
-    path                = "/"
+    path                = "/health"
     matcher             = "200"
     port                = "80"
     protocol            = "HTTP"
