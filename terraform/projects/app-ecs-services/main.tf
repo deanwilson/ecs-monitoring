@@ -16,13 +16,13 @@ variable "aws_region" {
 variable "remote_state_bucket" {
   type        = "string"
   description = "S3 bucket we store our terraform state in"
-  default     = "deanwilson-ecs-monitoring"
+  default     = "ecs-monitoring"
 }
 
 variable "stack_name" {
   type        = "string"
   description = "Unique name for this collection of resources"
-  default     = "dwilson-ecs-monitoring"
+  default     = "ecs-monitoring"
 }
 
 # Resources

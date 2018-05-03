@@ -11,7 +11,7 @@ related services. You will often have multiple VPCs in an account
 |------|-------------|:----:|:-----:|:-----:|
 | additional_tags | Stack specific tags to apply | map | `<map>` | no |
 | aws_region | AWS region | string | `eu-west-1` | no |
-| stack_name | Unique name for this collection of resources | string | `dwilson-ecs-monitoring` | no |
+| stack_name | Unique name for this collection of resources | string | `ecs-monitoring` | no |
 
 ## Outputs
 

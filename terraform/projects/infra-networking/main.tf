@@ -21,7 +21,7 @@ variable "aws_region" {
 variable "stack_name" {
   type        = "string"
   description = "Unique name for this collection of resources"
-  default     = "dwilson-ecs-monitoring"
+  default     = "ecs-monitoring"
 }
 
 
