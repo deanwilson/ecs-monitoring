@@ -17,7 +17,7 @@ resource "aws_ecs_task_definition" "base_nginx" {
 
 resource "aws_ecs_service" "nginx" {
   name            = "nginx"
-  cluster         = "default"
+  cluster         = "${local.cluster_name}"
   task_definition = "${aws_ecs_task_definition.base_nginx.arn}"
   desired_count   = 1
 #  iam_role        = "${aws_iam_role.foo.arn}" # TODO

@@ -25,6 +25,12 @@ variable "stack_name" {
   default     = "ecs-monitoring"
 }
 
+locals {
+
+  cluster_name = "${var.stack_name}-ecs-monitoring"
+
+}
+
 # Resources
 # --------------------------------------------------------------
 

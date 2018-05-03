@@ -15,7 +15,7 @@ resource "aws_ecs_task_definition" "prometheus_server" {
 
 resource "aws_ecs_service" "prometheus_server" {
   name            = "prometheus-server"
-  cluster         = "default"
+  cluster         = "${local.cluster_name}"
   task_definition = "${aws_ecs_task_definition.prometheus_server.arn}"
   desired_count   = 1
 }
