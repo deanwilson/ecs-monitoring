@@ -76,8 +76,9 @@ resource "aws_service_discovery_private_dns_namespace" "prometheus" {
 }
 
 
+# TODO: move these resources to the app-ecs-services project
 resource "aws_service_discovery_service" "prometheus_server" {
-  name = "prometheus_server"
+  name = "prometheus-server"
 
   dns_config {
     namespace_id = "${aws_service_discovery_private_dns_namespace.prometheus.id}"
@@ -88,8 +89,9 @@ resource "aws_service_discovery_service" "prometheus_server" {
   }
 }
 
+# TODO: move these resources to the app-ecs-services project
 resource "aws_service_discovery_service" "prometheus_blackbox" {
-  name = "prometheus_blackbox"
+  name = "prometheus-blackbox"
 
   dns_config {
     namespace_id = "${aws_service_discovery_private_dns_namespace.prometheus.id}"
@@ -99,6 +101,20 @@ resource "aws_service_discovery_service" "prometheus_blackbox" {
     }
   }
 }
+
+# TODO: move these resources to the app-ecs-services project
+resource "aws_service_discovery_service" "metrics_nginx" {
+  name = "metrics-nginx"
+
+  dns_config {
+    namespace_id = "${aws_service_discovery_private_dns_namespace.prometheus.id}"
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+  }
+}
+
 
 
 ## Outputs
@@ -111,4 +127,9 @@ output "prometheus_server_discovery_arn" {
 output "prometheus_blackbox_discovery_arn" {
   value       = "${aws_service_discovery_service.prometheus_blackbox.arn}"
   description = "Prometheus server service discovery ARN"
+}
+
+output "metrics_nginx_discovery_arn" {
+  value       = "${aws_service_discovery_service.metrics_nginx.arn}"
+  description = "Metrics Nginx server service discovery ARN"
 }
