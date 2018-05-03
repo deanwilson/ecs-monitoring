@@ -12,6 +12,7 @@ and cascade issues.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
+| additional_tags | Stack specific tags to apply | map | `<map>` | no |
 | aws_region | AWS region | string | `eu-west-1` | no |
 | remote_state_bucket | S3 bucket we store our terraform state in | string | `deanwilson-ecs-monitoring` | no |
 | remote_state_infra_networking_key_stack | Override infra-networking remote state path | string | `infra-security-groups.tfstate` | no |
