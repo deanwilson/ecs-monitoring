@@ -15,17 +15,17 @@ and enable versioning on this bucket before you run any other commands.
       --bucket ${TERRAFORM_BUCKET} \
       --versioning-configuration Status=Enabled
 
-You will currently need to run `sed` over the codebase if you want to
-use a different bucket name.
-
-Now you have a bucketname you will create the configurarion for your stack. Inside
-the `environments` directory you will find a pair of files for each stack, a `.backend`
-and a `.tfvars`. Make a copy of an existing pair and change the values to suit your new name.
+Now you have a bucketname you will create the configurarion for your
+stack. Inside the `environments` directory you will find a pair of files
+for each stack, a `.backend` and a `.tfvars`. Make a copy of an existing
+pair and change the values to suit your new name. The `bucket`
+and `remote_state_bucket` settings in these files must match the bucket you
+created above.
 
 ## Creating your environment
 
-Once you've created your environment, and tweaked the bucket name
-to suit your own bucket you can create the environment with:
+Once you've created your environment configurations, and added the
+correct bucket name, you can create the environment with:
 
     cd terraform/projects/infra-networking
 
