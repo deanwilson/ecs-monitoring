@@ -92,7 +92,7 @@ resource "aws_security_group" "monitoring_external_sg" {
     local.default_tags,
     var.additional_tags,
     map("Stackname", "${var.stack_name}"),
-    map("Name", "${var.stack_name}-ecs-monitoring")
+    map("Name", "${var.stack_name}-monitoring_external_sg")
   )}"
 
 }
@@ -126,7 +126,7 @@ resource "aws_security_group" "monitoring_internal_sg" {
     local.default_tags,
     var.additional_tags,
     map("Stackname", "${var.stack_name}"),
-    map("Name", "${var.stack_name}-ecs-monitoring")
+    map("Name", "${var.stack_name}-monitoring_internal_sg")
   )}"
 
 }
