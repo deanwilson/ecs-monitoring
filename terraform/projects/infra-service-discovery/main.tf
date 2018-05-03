@@ -68,19 +68,18 @@ data "terraform_remote_state" "infra_networking" {
   }
 }
 
-
 resource "aws_service_discovery_private_dns_namespace" "prometheus" {
   name        = "sd.ecs-monitoring.com"
   description = "ECS Monitoring service discovery zone"
   vpc         = "${data.terraform_remote_state.infra_networking.vpc_id}"
 }
 
-
 resource "aws_service_discovery_service" "prometheus_server" {
   name = "prometheus_server"
 
   dns_config {
     namespace_id = "${aws_service_discovery_private_dns_namespace.prometheus.id}"
+
     dns_records {
       ttl  = 10
       type = "A"
@@ -93,13 +92,13 @@ resource "aws_service_discovery_service" "prometheus_blackbox" {
 
   dns_config {
     namespace_id = "${aws_service_discovery_private_dns_namespace.prometheus.id}"
+
     dns_records {
       ttl  = 10
       type = "A"
     }
   }
 }
-
 
 ## Outputs
 
