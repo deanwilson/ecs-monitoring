@@ -1,0 +1,36 @@
+[
+  {
+    "name": "cadvisor",
+    "image": "google/cadvisor",
+    "cpu": 10,
+    "memory": 300,
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": 8080,
+        "hostPort": 8080
+      }
+    ],
+    "mountPoints": [
+      {
+        "sourceVolume": "root",
+        "containerPath": "/rootfs",
+        "readOnly": true
+      },
+      {
+        "sourceVolume": "var_run",
+        "containerPath": "/var/run"
+      },
+      {
+        "sourceVolume": "sys",
+        "containerPath": "/sys",
+        "readOnly": true
+      },
+      {
+        "sourceVolume": "var_lib_docker",
+        "containerPath": "/var/lib/docker",
+        "readOnly": true
+      }
+    ]
+  }
+]
