@@ -25,6 +25,12 @@ variable "stack_name" {
   default     = "ecs-monitoring"
 }
 
+locals {
+
+  cluster_name = "${var.stack_name}-ecs-monitoring"
+
+}
+
 # Resources
 # --------------------------------------------------------------
 
@@ -39,7 +45,7 @@ terraform {
 }
 
 provider "aws" {
-  version = "~> 1.14.1"
+  version = "~> 1.17.0"
   region  = "${var.aws_region}"
 }
 
@@ -54,6 +60,17 @@ data "terraform_remote_state" "infra_networking" {
     region = "${var.aws_region}"
   }
 }
+
+data "terraform_remote_state" "infra_service_discovery" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.remote_state_bucket}"
+    key    = "infra-service-discovery.tfstate"
+    region = "${var.aws_region}"
+  }
+}
+
 
 data "terraform_remote_state" "infra_security_groups" {
   backend = "s3"
