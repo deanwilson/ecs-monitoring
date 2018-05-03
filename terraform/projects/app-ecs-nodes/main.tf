@@ -44,7 +44,7 @@ variable "ecs_instance_ssh_keyname" {
 variable "remote_state_bucket" {
   type        = "string"
   description = "S3 bucket we store our terraform state in"
-  default     = "deanwilson-ecs-monitoring"
+  default     = "ecs-monitoring"
 }
 
 variable "remote_state_infra_networking_key_stack" {
@@ -56,7 +56,7 @@ variable "remote_state_infra_networking_key_stack" {
 variable "stack_name" {
   type        = "string"
   description = "Unique name for this collection of resources"
-  default     = "dwilson-ecs-monitoring"
+  default     = "ecs-monitoring"
 }
 
 # locals
