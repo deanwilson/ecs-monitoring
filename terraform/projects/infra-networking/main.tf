@@ -50,7 +50,7 @@ terraform {
 }
 
 provider "aws" {
-  version = "~> 1.14.1"
+  version = "~> 1.17.0"
   region  = "${var.aws_region}"
 }
 
