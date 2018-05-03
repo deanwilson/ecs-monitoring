@@ -69,6 +69,8 @@ locals {
     "Project"  = "app-ecs-nodes"
   }
 
+  cluster_name = "${var.stack_name}-ecs-monitoring"
+
 }
 
 # Resources
@@ -87,6 +89,10 @@ terraform {
 provider "aws" {
   version = "~> 1.14.1"
   region  = "${var.aws_region}"
+}
+
+provider "template" {
+  version = "~> 1.0.0"
 }
 
 ## Data sources
@@ -123,6 +129,19 @@ resource "null_resource" "node_autoscaling_group_tags" {
   }
 }
 
+resource "aws_ecs_cluster" "prometheus_cluster" {
+  name = "${local.cluster_name}"
+}
+
+data "template_file" "prometheus_user_data" {
+  template = "${file("prometheus-user-data.tpl")}"
+
+  vars {
+    cluster_name = "${local.cluster_name}"
+  }
+}
+
+
 module "ecs-node-1" {
   source = "terraform-aws-modules/autoscaling/aws"
 
@@ -145,16 +164,7 @@ module "ecs-node-1" {
     },
   ]
 
-  user_data = <<EOF
-#!/bin/bash
-# Set any ECS agent configuration options
-yum install -y ecs-init
-start ecs
-service docker start
-
-#echo 'ECS_CLUSTER=dwilson-ecs-monitoring' >> /etc/ecs/ecs.config
-echo 'ECS_CLUSTER=default' >> /etc/ecs/ecs.config
-EOF
+  user_data = "${data.template_file.prometheus_user_data.rendered}"
 
   # Auto scaling group
   asg_name                  = "${var.stack_name}-ecs-node-1"
@@ -167,7 +177,6 @@ EOF
 
   tags = ["${concat(
     null_resource.node_autoscaling_group_tags.*.triggers)
-    # list(default_tags, "propagate_at_launch", true) # TODO - add local tags
   }"]
 
 }
