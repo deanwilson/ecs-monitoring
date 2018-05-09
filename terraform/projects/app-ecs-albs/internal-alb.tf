@@ -5,6 +5,7 @@ variable "internal_service_aliases" {
     "metrics-nginx",
     "prometheus-blackbox",
     "prometheus-server",
+    "grafana",
   ]
 }
 
@@ -91,6 +92,37 @@ resource "aws_lb_listener" "monitoring_internal_prometheus_blackbox" {
   }
 }
 
+### Grafana
+
+resource "aws_lb_target_group" "monitoring_internal_grafana_tg" {
+  name     = "${var.stack_name}-int-grafana-tg"
+  port     = 3000
+  protocol = "HTTP"
+  vpc_id   = "${data.terraform_remote_state.infra_networking.vpc_id}"
+
+  health_check {
+    interval            = "10"
+    path                = "/metrics"
+    matcher             = "200"
+    port                = "3000"
+    protocol            = "HTTP"
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = "6"
+  }
+}
+
+resource "aws_lb_listener" "monitoring_internal_grafana" {
+  load_balancer_arn = "${aws_lb.monitoring_internal_alb.arn}"
+  port              = "3000"
+  protocol          = "HTTP"
+
+  default_action {
+    target_group_arn = "${aws_lb_target_group.monitoring_internal_grafana_tg.arn}"
+    type             = "forward"
+  }
+}
+
 
 ### Add DNS Aliases
 # Add all the aliases that should point to the internal load balancer
@@ -119,6 +151,12 @@ output "monitoring_internal_blackbox_tg" {
   value       = "${aws_lb_target_group.monitoring_internal_prometheus_blackbox_tg.arn}"
   description = "Prometheus server internal ALB target group"
 }
+
+output "monitoring_internal_grafana_tg" {
+  value       = "${aws_lb_target_group.monitoring_internal_grafana_tg.arn}"
+  description = "Grafana internal ALB target group"
+}
+
 
 output "monitoring_internal_dns" {
   value       = "${aws_lb.monitoring_internal_alb.dns_name}"

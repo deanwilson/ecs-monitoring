@@ -150,6 +150,17 @@ resource "aws_security_group_rule" "monitoring_int_alb_sg_ingress_int-alb_promet
   description = "ALB ingress for load balanced prometheus blackbox"
 }
 
+resource "aws_security_group_rule" "monitoring_int_alb_sg_ingress_int-alb_grafana" {
+  type      = "ingress"
+  from_port = 3000
+  to_port   = 3000
+  protocol  = "tcp"
+
+  security_group_id        = "${aws_security_group.monitoring_int_alb_sg.id}"
+  source_security_group_id = "${aws_security_group.monitoring_internal_sg.id}"
+
+  description = "ALB ingress for load balanced prometheus blackbox"
+}
 
 resource "aws_security_group_rule" "monitoring_int_alb_sg_egress_any_any" {
   type              = "egress"
@@ -209,6 +220,17 @@ resource "aws_security_group_rule" "monitoring_internal_sg_ingress_int-alb_prome
   description = "Internal ALB to blackbox"
 }
 
+resource "aws_security_group_rule" "monitoring_internal_sg_ingress_int-alb_prometheus-grafana" {
+  type      = "ingress"
+  from_port = 3000
+  to_port   = 3000
+  protocol  = "tcp"
+
+  security_group_id        = "${aws_security_group.monitoring_internal_sg.id}"
+  source_security_group_id = "${aws_security_group.monitoring_int_alb_sg.id}"
+
+  description = "Internal ALB to blackbox"
+}
 
 
 resource "aws_security_group_rule" "monitoring_internal_sg_egress_any_any" {
