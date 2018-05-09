@@ -62,6 +62,36 @@ resource "aws_lb_listener" "monitoring_internal_prometheus_server" {
 
 ### Prometheus blackbox
 
+resource "aws_lb_target_group" "monitoring_internal_prometheus_blackbox_tg" {
+  name     = "${var.stack_name}-int-blackbox-tg"
+  port     = 9115
+  protocol = "HTTP"
+  vpc_id   = "${data.terraform_remote_state.infra_networking.vpc_id}"
+
+  health_check {
+    interval            = "10"
+    path                = "/metrics"
+    matcher             = "200"
+    port                = "9115"
+    protocol            = "HTTP"
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = "6"
+  }
+}
+
+resource "aws_lb_listener" "monitoring_internal_prometheus_blackbox" {
+  load_balancer_arn = "${aws_lb.monitoring_internal_alb.arn}"
+  port              = "9115"
+  protocol          = "HTTP"
+
+  default_action {
+    target_group_arn = "${aws_lb_target_group.monitoring_internal_prometheus_blackbox_tg.arn}"
+    type             = "forward"
+  }
+}
+
+
 ### Add DNS Aliases
 # Add all the aliases that should point to the internal load balancer
 
@@ -82,6 +112,11 @@ resource "aws_route53_record" "internal_service_aliases" {
 
 output "monitoring_internal_prometheus_server_tg" {
   value       = "${aws_lb_target_group.monitoring_internal_prometheus_server_tg.arn}"
+  description = "Prometheus server internal ALB target group"
+}
+
+output "monitoring_internal_blackbox_tg" {
+  value       = "${aws_lb_target_group.monitoring_internal_prometheus_blackbox_tg.arn}"
   description = "Prometheus server internal ALB target group"
 }
 

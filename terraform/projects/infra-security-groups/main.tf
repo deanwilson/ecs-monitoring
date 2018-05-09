@@ -138,6 +138,19 @@ resource "aws_security_group_rule" "monitoring_int_alb_sg_ingress_int-alb_promet
   description = "Nginx auth container to load balanced prometheus"
 }
 
+resource "aws_security_group_rule" "monitoring_int_alb_sg_ingress_int-alb_prometheus-blackbox" {
+  type      = "ingress"
+  from_port = 9115
+  to_port   = 9115
+  protocol  = "tcp"
+
+  security_group_id        = "${aws_security_group.monitoring_int_alb_sg.id}"
+  source_security_group_id = "${aws_security_group.monitoring_internal_sg.id}"
+
+  description = "ALB ingress for load balanced prometheus blackbox"
+}
+
+
 resource "aws_security_group_rule" "monitoring_int_alb_sg_egress_any_any" {
   type              = "egress"
   from_port         = 0
@@ -181,8 +194,21 @@ resource "aws_security_group_rule" "monitoring_internal_sg_ingress_int-alb_prome
   security_group_id        = "${aws_security_group.monitoring_internal_sg.id}"
   source_security_group_id = "${aws_security_group.monitoring_int_alb_sg.id}"
 
-  description = "Nginx auth container to load balanced prometheus"
+  description = "Nginx auth container to load balance prometheus"
 }
+
+resource "aws_security_group_rule" "monitoring_internal_sg_ingress_int-alb_prometheus-blackbox" {
+  type      = "ingress"
+  from_port = 9115
+  to_port   = 9115
+  protocol  = "tcp"
+
+  security_group_id        = "${aws_security_group.monitoring_internal_sg.id}"
+  source_security_group_id = "${aws_security_group.monitoring_int_alb_sg.id}"
+
+  description = "Internal ALB to blackbox"
+}
+
 
 
 resource "aws_security_group_rule" "monitoring_internal_sg_egress_any_any" {

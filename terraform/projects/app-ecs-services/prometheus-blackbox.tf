@@ -16,4 +16,10 @@ resource "aws_ecs_service" "prometheus_blackbox" {
   cluster         = "${local.cluster_name}"
   task_definition = "${aws_ecs_task_definition.prometheus_blackbox.arn}"
   desired_count   = 1
+
+  load_balancer {
+    target_group_arn = "${data.terraform_remote_state.app_ecs_albs.monitoring_internal_blackbox_tg}"
+    container_name   = "prometheus-blackbox"
+    container_port   = 9115
+  }
 }
