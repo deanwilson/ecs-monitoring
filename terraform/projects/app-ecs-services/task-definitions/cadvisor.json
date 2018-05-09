@@ -27,8 +27,18 @@
         "readOnly": true
       },
       {
+        "sourceVolume": "cgroup",
+        "containerPath": "/sys/fs/cgroup",
+        "readOnly": true
+      },
+      {
         "sourceVolume": "var_lib_docker",
         "containerPath": "/var/lib/docker",
+        "readOnly": true
+      },
+      {
+        "sourceVolume": "dev_disk",
+        "containerPath": "/dev/disk",
         "readOnly": true
       }
     ]

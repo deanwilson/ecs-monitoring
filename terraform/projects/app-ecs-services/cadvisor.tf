@@ -21,6 +21,16 @@ resource "aws_ecs_task_definition" "cadvisor" {
     name      = "var_lib_docker"
     host_path = "/var/lib/docker/"
   }
+
+  volume {
+    name      = "cgroup"
+    host_path = "/cgroup"
+  }
+
+  volume {
+    name      = "dev_disk"
+    host_path = "/dev/disk"
+  }
 }
 
 resource "aws_ecs_service" "cadvisor" {
