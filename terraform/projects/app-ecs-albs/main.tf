@@ -81,6 +81,16 @@ data "terraform_remote_state" "infra_security_groups" {
   }
 }
 
+data "terraform_remote_state" "infra_dns_discovery" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.remote_state_bucket}"
+    key    = "infra-dns-discovery.tfstate"
+    region = "${var.aws_region}"
+  }
+}
+
 ## Resources
 
 ### External ALB
