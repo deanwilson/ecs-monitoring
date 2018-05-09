@@ -31,6 +31,8 @@ data "aws_iam_policy_document" "ecs_node_document" {
     resources = ["*"]
 
     actions = [
+      "ec2:DescribeInstances",
+      "ec2:DescribeTags",
       "ecs:CreateCluster",
       "ecs:DeregisterContainerInstance",
       "ecs:DiscoverPollEndpoint",
