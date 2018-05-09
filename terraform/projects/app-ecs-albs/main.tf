@@ -87,7 +87,7 @@ resource "aws_lb" "monitoring_external_alb" {
   name               = "${var.stack_name}-ext-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = ["${data.terraform_remote_state.infra_security_groups.monitoring_external_sg_id}"]
+  security_groups    = ["${data.terraform_remote_state.infra_security_groups.monitoring_ext_alb_sg_id}"]
 
   subnets = [
     "${element(data.terraform_remote_state.infra_networking.public_subnets, 1)}",

@@ -78,10 +78,10 @@ data "terraform_remote_state" "infra_networking" {
 
 ## Resources
 
-### External SG
+### External ALB SG
 
-resource "aws_security_group" "monitoring_external_sg" {
-  name        = "${var.stack_name}-monitoring_external_sg"
+resource "aws_security_group" "monitoring_ext_alb_sg" {
+  name        = "${var.stack_name}-monitoring_ext_alb_sg"
   vpc_id      = "${data.terraform_remote_state.infra_networking.vpc_id}"
   description = "Controls external access to the monitoring instances"
 
@@ -89,29 +89,65 @@ resource "aws_security_group" "monitoring_external_sg" {
     local.default_tags,
     var.additional_tags,
     map("Stackname", "${var.stack_name}"),
-    map("Name", "${var.stack_name}-monitoring_external_sg")
+    map("Name", "${var.stack_name}-monitoring_ext_alb_sg")
   )}"
 }
 
-resource "aws_security_group_rule" "monitoring_external_sg_ingress_any_http" {
+resource "aws_security_group_rule" "monitoring_ext_alb_sg_ingress_any_http" {
   type              = "ingress"
   to_port           = 80
   from_port         = 80
   protocol          = "tcp"
-  security_group_id = "${aws_security_group.monitoring_external_sg.id}"
+  security_group_id = "${aws_security_group.monitoring_ext_alb_sg.id}"
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group_rule" "monitoring_external_sg_egress_any_any" {
+resource "aws_security_group_rule" "monitoring_ext_alb_sg_egress_any_any" {
   type              = "egress"
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.monitoring_external_sg.id}"
+  security_group_id = "${aws_security_group.monitoring_ext_alb_sg.id}"
 }
 
-### Internal SG
+### Internal ALB SG
+
+resource "aws_security_group" "monitoring_int_alb_sg" {
+  name        = "${var.stack_name}-monitoring_int_alb_sg"
+  vpc_id      = "${data.terraform_remote_state.infra_networking.vpc_id}"
+  description = "Controls access to the internal services via the internal ALB"
+
+  tags = "${merge(
+    local.default_tags,
+    var.additional_tags,
+    map("Stackname", "${var.stack_name}"),
+    map("Name", "${var.stack_name}-monitoring_int_alb_sg")
+  )}"
+}
+
+resource "aws_security_group_rule" "monitoring_int_alb_sg_ingress_int-alb_prometheus" {
+  type      = "ingress"
+  from_port = 9090
+  to_port   = 9090
+  protocol  = "tcp"
+
+  security_group_id        = "${aws_security_group.monitoring_int_alb_sg.id}"
+  source_security_group_id = "${aws_security_group.monitoring_internal_sg.id}"
+
+  description = "Nginx auth container to load balanced prometheus"
+}
+
+resource "aws_security_group_rule" "monitoring_int_alb_sg_egress_any_any" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.monitoring_int_alb_sg.id}"
+}
+
+### Internal ECS Node SG
 
 resource "aws_security_group" "monitoring_internal_sg" {
   name        = "${var.stack_name}-monitoring_internal_sg"
@@ -133,8 +169,21 @@ resource "aws_security_group_rule" "monitoring_internal_sg_ingress_alb_http" {
   protocol  = "tcp"
 
   security_group_id        = "${aws_security_group.monitoring_internal_sg.id}"
-  source_security_group_id = "${aws_security_group.monitoring_external_sg.id}"
+  source_security_group_id = "${aws_security_group.monitoring_ext_alb_sg.id}"
 }
+
+resource "aws_security_group_rule" "monitoring_internal_sg_ingress_int-alb_prometheus" {
+  type      = "ingress"
+  from_port = 9090
+  to_port   = 9090
+  protocol  = "tcp"
+
+  security_group_id        = "${aws_security_group.monitoring_internal_sg.id}"
+  source_security_group_id = "${aws_security_group.monitoring_int_alb_sg.id}"
+
+  description = "Nginx auth container to load balanced prometheus"
+}
+
 
 resource "aws_security_group_rule" "monitoring_internal_sg_egress_any_any" {
   type              = "egress"
@@ -147,9 +196,14 @@ resource "aws_security_group_rule" "monitoring_internal_sg_egress_any_any" {
 
 ## Outputs
 
-output "monitoring_external_sg_id" {
-  value       = "${aws_security_group.monitoring_external_sg.id}"
-  description = "monitoring_external_sg ID"
+output "monitoring_ext_alb_sg_id" {
+  value       = "${aws_security_group.monitoring_ext_alb_sg.id}"
+  description = "monitoring_ext_alb_sg ID"
+}
+
+output "monitoring_int_alb_sg_id" {
+  value       = "${aws_security_group.monitoring_int_alb_sg.id}"
+  description = "monitoring_int_alb_sg ID"
 }
 
 output "monitoring_internal_sg_id" {
