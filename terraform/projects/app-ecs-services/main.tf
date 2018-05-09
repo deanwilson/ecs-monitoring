@@ -47,6 +47,10 @@ provider "aws" {
   region  = "${var.aws_region}"
 }
 
+provider "template" {
+  version = "~> 1.0.0"
+}
+
 ## Data sources
 
 data "terraform_remote_state" "infra_networking" {
@@ -55,16 +59,6 @@ data "terraform_remote_state" "infra_networking" {
   config {
     bucket = "${var.remote_state_bucket}"
     key    = "infra-networking.tfstate"
-    region = "${var.aws_region}"
-  }
-}
-
-data "terraform_remote_state" "infra_service_discovery" {
-  backend = "s3"
-
-  config {
-    bucket = "${var.remote_state_bucket}"
-    key    = "infra-service-discovery.tfstate"
     region = "${var.aws_region}"
   }
 }
@@ -85,6 +79,16 @@ data "terraform_remote_state" "app_ecs_albs" {
   config {
     bucket = "${var.remote_state_bucket}"
     key    = "app-ecs-albs.tfstate"
+    region = "${var.aws_region}"
+  }
+}
+
+data "terraform_remote_state" "infra_dns_discovery" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.remote_state_bucket}"
+    key    = "infra-dns-discovery.tfstate"
     region = "${var.aws_region}"
   }
 }

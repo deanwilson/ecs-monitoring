@@ -11,6 +11,9 @@
         "hostPort": 9090
       }
     ],
+    "dnsSearchDomains": [
+      "${search_domain}"
+    ],
     "mountPoints": [
       {
         "sourceVolume": "prometheus-config",

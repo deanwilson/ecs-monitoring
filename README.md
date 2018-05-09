@@ -31,19 +31,23 @@ correct bucket name, you can create the environment with:
 
     $ terraform init -backend-config=../../../environments/dwilson-staging.backend
 
-    $ terraform plan -var-file=./../../environments/dwilson-staging.tfvars
+    $ terraform plan -var-file=../../../environments/dwilson-staging.tfvars
 
-    $ terraform apply -var-file=./../../environments/dwilson-staging.tfvars
+    $ terraform apply -var-file=../../../environments/dwilson-staging.tfvars
 
     cd ../infra-security-groups
 
     # terraform commands from above
 
-    cd ../app-ecs-nodes
+    cd ../infra-dns-discovery
 
     # terraform commands from above
 
     cd ../app-ecs-albs
+
+    # terraform commands from above
+
+    cd ../app-ecs-nodes
 
     # terraform commands from above
 
