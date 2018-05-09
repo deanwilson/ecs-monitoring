@@ -208,6 +208,18 @@ resource "aws_security_group_rule" "monitoring_internal_sg_ingress_int-alb_prome
   description = "Nginx auth container to load balance prometheus"
 }
 
+resource "aws_security_group_rule" "monitoring_internal_sg_ingress_loopback_alertmanager" {
+  type      = "ingress"
+  from_port = 9093
+  to_port   = 9093
+  protocol  = "tcp"
+
+  security_group_id        = "${aws_security_group.monitoring_internal_sg.id}"
+  source_security_group_id = "${aws_security_group.monitoring_internal_sg.id}"
+
+  description = "ECS instances can connect to themselves to access AlertManager"
+}
+
 resource "aws_security_group_rule" "monitoring_internal_sg_ingress_int-alb_prometheus-blackbox" {
   type      = "ingress"
   from_port = 9115
