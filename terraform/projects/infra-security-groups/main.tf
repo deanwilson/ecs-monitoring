@@ -181,7 +181,7 @@ resource "aws_security_group_rule" "monitoring_internal_sg_ingress_int-alb_prome
   security_group_id        = "${aws_security_group.monitoring_internal_sg.id}"
   source_security_group_id = "${aws_security_group.monitoring_int_alb_sg.id}"
 
-  description = "Nginx auth container to load balanced prometheus"
+  description = "Nginx auth container to load balance prometheus"
 }
 
 
