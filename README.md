@@ -39,11 +39,15 @@ correct bucket name, you can create the environment with:
 
     # terraform commands from above
 
-    cd ../app-ecs-nodes
+    cd ../infra-dns-discovery
 
     # terraform commands from above
 
     cd ../app-ecs-albs
+
+    # terraform commands from above
+
+    cd ../app-ecs-nodes
 
     # terraform commands from above
 
