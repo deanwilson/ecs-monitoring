@@ -83,6 +83,8 @@ data "terraform_remote_state" "infra_security_groups" {
 
 ## Resources
 
+### External ALB
+
 resource "aws_lb" "monitoring_external_alb" {
   name               = "${var.stack_name}-ext-alb"
   internal           = false
@@ -105,7 +107,7 @@ resource "aws_lb" "monitoring_external_alb" {
     local.default_tags,
     var.additional_tags,
     map("Stackname", "${var.stack_name}"),
-    map("Name", "${var.stack_name}-ecs-monitoring")
+    map("Name", "${var.stack_name}-ecs-monitoring-external")
   )}"
 }
 
@@ -143,4 +145,9 @@ resource "aws_lb_listener" "monitoring_external" {
 output "monitoring_external_tg" {
   value       = "${aws_lb_target_group.monitoring_external_tg.arn}"
   description = "External Monitoring ALB target group"
+}
+
+output "monitoring_external_dns" {
+  value       = "${aws_lb.monitoring_external_alb.dns_name}"
+  description = "External Monitoring ALB DNS name"
 }
