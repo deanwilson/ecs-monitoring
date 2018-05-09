@@ -103,10 +103,27 @@ resource "aws_service_discovery_service" "prometheus_blackbox" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 # TODO: move these resources to the app-ecs-services project
 resource "aws_service_discovery_service" "metrics_nginx" {
   name = "metrics-nginx"
+=======
+# TODO: move these resources to the app-ecs-services project
+resource "aws_service_discovery_service" "metrics_nginx" {
+  name = "metrics-nginx"
+
+  dns_config {
+    namespace_id = "${aws_service_discovery_private_dns_namespace.prometheus.id}"
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+  }
+}
+
+
+>>>>>>> 8a1077b5664e6868209ae7eee24769f9f3a03c83
 
   dns_config {
     namespace_id = "${aws_service_discovery_private_dns_namespace.prometheus.id}"
