@@ -1,6 +1,14 @@
+data "template_file" "base_nginx_container_definition" {
+  template = "${file("task-definitions/base-nginx.json.tpl")}"
+
+  vars {
+    search_domain = "${data.terraform_remote_state.infra_dns_discovery.private_monitoring_domain_name}"
+  }
+}
+
 resource "aws_ecs_task_definition" "base_nginx" {
   family                = "nginx"
-  container_definitions = "${file("task-definitions/base-nginx.json")}"
+  container_definitions = "${data.template_file.base_nginx_container_definition.rendered}"
 
   volume {
     name      = "external-config-password"

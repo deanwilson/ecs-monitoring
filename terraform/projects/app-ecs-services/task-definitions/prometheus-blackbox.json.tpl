@@ -10,6 +10,9 @@
         "containerPort": 9115,
         "hostPort": 9115
       }
+    ],
+    "dnsSearchDomains": [
+      "${search_domain}"
     ]
   }
 ]

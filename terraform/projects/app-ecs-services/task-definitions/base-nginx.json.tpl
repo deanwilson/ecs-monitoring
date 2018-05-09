@@ -11,6 +11,9 @@
         "hostPort": 80
       }
     ],
+    "dnsSearchDomains": [
+      "${search_domain}"
+    ],
     "mountPoints": [
       {
         "sourceVolume": "external-config-password",
