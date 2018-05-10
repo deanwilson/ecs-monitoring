@@ -1,6 +1,20 @@
-# ecs-monitoring
+# AWS ECS monitoring cluster
 
-An AWS ECS based monitoring stack - learning repo - not for prod
+Prometheus monitoring stack implemented as an AWS ECS learning experiment
+
+## Introduction
+
+This repository is an experiment in running containerised services
+on Amazon Elastic Container Service (ECS). It only implements the services
+needed to experiment with ECS as a platform, it does not contain many of the
+features you'd expect in a full amazon environment, such as enabling CloudTrail.
+
+## Architecture
+
+The general architecture for this implementation is a standard VPC with three
+levels of subnets, public, private and database. All ingress is provided by an
+external ALB in front of Nginx, which connects to a number of internal services,
+some of which use an internal ALB and private route53 zone.
 
 ## Set up your environment
 
@@ -15,7 +29,7 @@ and enable versioning on this bucket before you run any other commands.
       --bucket ${TERRAFORM_BUCKET} \
       --versioning-configuration Status=Enabled
 
-Now you have a bucketname you will create the configurarion for your
+Now you have a bucket name you will create the configuration for your
 stack. Inside the `environments` directory you will find a pair of files
 for each stack, a `.backend` and a `.tfvars`. Make a copy of an existing
 pair and change the values to suit your new name. The `bucket`
@@ -25,35 +39,33 @@ created above.
 ## Creating your environment
 
 Once you've created your environment configurations, and added the
-correct bucket name, you can create the environment with:
+correct bucket name, you can create the environment. Each stage of the
+environment is separated into a directory inside
+[terraform/projects](/terraform/projects) to allow easier changing of
+individual aspects of the deployment.
 
+The commands to build each section are the same between components:
+
+    # change to the project directory
     cd terraform/projects/infra-networking
 
+    # Initialise the backend to use our S3 bucket
     $ terraform init -backend-config=../../../environments/dwilson-staging.backend
 
+    # show all the pending actions (most useful when changing terraform code)
     $ terraform plan -var-file=../../../environments/dwilson-staging.tfvars
 
+    # apply the changes to your running system
     $ terraform apply -var-file=../../../environments/dwilson-staging.tfvars
 
-    cd ../infra-security-groups
+To build a full environment the order is:
 
-    # terraform commands from above
-
-    cd ../infra-dns-discovery
-
-    # terraform commands from above
-
-    cd ../app-ecs-albs
-
-    # terraform commands from above
-
-    cd ../app-ecs-nodes
-
-    # terraform commands from above
-
-    cd ../app-ecs-services
-
-    # terraform commands from above
+ * infra-networking
+ * infra-security-groups
+ * infra-dns-discovery
+ * app-ecs-albs
+ * app-ecs-nodes
+ * app-ecs-services
 
 ## Creating documentation
 
@@ -70,7 +82,7 @@ In the project directory and add that to your commit.
 
 ### Newest ECS AMI
 
-To see the latest ECS Optimized Amazon Linux AMI information in your
+To see the latest ECS Optimised Amazon Linux AMI information in your
 default region, run this AWS CLI command:
 
     aws ssm get-parameters --names /aws/service/ecs/optimized-ami/amazon-linux/recommended
