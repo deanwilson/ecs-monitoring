@@ -244,7 +244,6 @@ resource "aws_security_group_rule" "monitoring_internal_sg_ingress_int-alb_prome
   description = "Internal ALB to blackbox"
 }
 
-
 resource "aws_security_group_rule" "monitoring_internal_sg_egress_any_any" {
   type              = "egress"
   from_port         = 0

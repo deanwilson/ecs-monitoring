@@ -1,7 +1,8 @@
 variable "internal_service_aliases" {
   type        = "list"
   description = "A list of internal aliases that resolve to the internal ALB"
-  default     = [
+
+  default = [
     "metrics-nginx",
     "prometheus-blackbox",
     "prometheus-server",
@@ -123,7 +124,6 @@ resource "aws_lb_listener" "monitoring_internal_grafana" {
   }
 }
 
-
 ### Add DNS Aliases
 # Add all the aliases that should point to the internal load balancer
 
@@ -136,7 +136,7 @@ resource "aws_route53_record" "internal_service_aliases" {
   alias {
     name                   = "${aws_lb.monitoring_internal_alb.dns_name}"
     zone_id                = "${aws_lb.monitoring_internal_alb.zone_id}"
-    evaluate_target_health = false /* TODO */
+    evaluate_target_health = false                                        /* TODO */
   }
 }
 
@@ -156,7 +156,6 @@ output "monitoring_internal_grafana_tg" {
   value       = "${aws_lb_target_group.monitoring_internal_grafana_tg.arn}"
   description = "Grafana internal ALB target group"
 }
-
 
 output "monitoring_internal_dns" {
   value       = "${aws_lb.monitoring_internal_alb.dns_name}"

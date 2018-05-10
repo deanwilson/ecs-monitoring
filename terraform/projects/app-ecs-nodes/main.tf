@@ -175,6 +175,7 @@ module "ecs-node-1" {
   tags = ["${concat(
     null_resource.node_autoscaling_group_tags.*.triggers)
   }"]
+
   # TODO: add stackname here. Once done redo discovery to use it
 }
 
