@@ -74,3 +74,11 @@ To see the latest ECS Optimized Amazon Linux AMI information in your
 default region, run this AWS CLI command:
 
     aws ssm get-parameters --names /aws/service/ecs/optimized-ami/amazon-linux/recommended
+
+### License
+
+This repo and the code within it are licensed under the GPLv2.
+
+### Author
+
+[Dean Wilson](https://www.unixdaemon.net)
