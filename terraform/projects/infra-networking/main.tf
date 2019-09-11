@@ -2,7 +2,10 @@
 * ## Project: infra-networking
 *
 * Terraform project to deploy the networking required for a VPC and
-* related services. You will often have multiple VPCs in an account
+* related services. You will often have multiple VPCs in an account.
+*
+* Also provides the private Route53 zone used for internal service
+* communication.
 *
 */
 
@@ -24,12 +27,19 @@ variable "stack_name" {
   default     = "ecs-monitoring"
 }
 
+variable "zone_name" {
+  type        = "string"
+  description = "Private zone name for internal communication"
+  default     = "sd.ecs-monitoring.com"
+}
+
 # locals
 # --------------------------------------------------------------
 
 locals {
   default_tags = {
     Terraform = "true"
+    Project   = "infra-networking"
   }
 }
 
@@ -79,11 +89,30 @@ module "vpc" {
   )}"
 }
 
+resource "aws_route53_zone" "private_monitoring" {
+  name = "${var.zone_name}"
+
+  comment = "Terraform managed private zone for service communication"
+  vpc_id  = "${module.vpc.vpc_id}"
+
+  tags = "${merge(
+    local.default_tags,
+    var.additional_tags,
+    map("Stackname", "${var.stack_name}"),
+    map("Name", "${var.stack_name}-ecs-monitoring-private")
+  )}"
+}
+
 ## Outputs
 
-output "vpc_id" {
-  value       = "${module.vpc.vpc_id}"
-  description = "VPC ID where the stack resources are created"
+output "private_monitoring_domain_name" {
+  value       = "${var.zone_name}"
+  description = "Domain name used for the private Route53 zone"
+}
+
+output "private_monitoring_zone_id" {
+  value       = "${aws_route53_zone.private_monitoring.zone_id}"
+  description = "Private monitoring Route53 zone ID"
 }
 
 output "private_subnets" {
@@ -94,4 +123,9 @@ output "private_subnets" {
 output "public_subnets" {
   value       = "${module.vpc.public_subnets}"
   description = "List of public subnet IDs"
+}
+
+output "vpc_id" {
+  value       = "${module.vpc.vpc_id}"
+  description = "VPC ID where the stack resources are created"
 }

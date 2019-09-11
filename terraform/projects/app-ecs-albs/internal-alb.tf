@@ -129,8 +129,8 @@ resource "aws_lb_listener" "monitoring_internal_grafana" {
 
 resource "aws_route53_record" "internal_service_aliases" {
   count   = "${length(var.internal_service_aliases)}"
-  zone_id = "${data.terraform_remote_state.infra_dns_discovery.private_monitoring_zone_id}"
-  name    = "${element(var.internal_service_aliases, count.index)}.${data.terraform_remote_state.infra_dns_discovery.private_monitoring_domain_name}"
+  zone_id = "${data.terraform_remote_state.infra_networking.private_monitoring_zone_id}"
+  name    = "${element(var.internal_service_aliases, count.index)}.${data.terraform_remote_state.infra_networking.private_monitoring_domain_name}"
   type    = "A"
 
   alias {

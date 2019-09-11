@@ -62,7 +62,6 @@ To build a full environment the order is:
 
  * infra-networking
  * infra-security-groups
- * infra-dns-discovery
  * app-ecs-albs
  * app-ecs-nodes
  * app-ecs-services

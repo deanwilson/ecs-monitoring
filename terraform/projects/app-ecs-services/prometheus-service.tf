@@ -2,7 +2,7 @@ data "template_file" "prometheus_server_container_definition" {
   template = "${file("task-definitions/prometheus-server.json.tpl")}"
 
   vars {
-    search_domain = "${data.terraform_remote_state.infra_dns_discovery.private_monitoring_domain_name}"
+    search_domain = "${data.terraform_remote_state.infra_networking.private_monitoring_domain_name}"
   }
 }
 
