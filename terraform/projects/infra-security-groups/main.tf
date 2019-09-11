@@ -220,6 +220,19 @@ resource "aws_security_group_rule" "monitoring_internal_sg_ingress_loopback_aler
   description = "ECS instances can connect to themselves to access AlertManager"
 }
 
+resource "aws_security_group_rule" "monitoring_internal_sg_ingress_loopback_cadvisor" {
+  type      = "ingress"
+  from_port = 8080
+  to_port   = 8080
+  protocol  = "tcp"
+
+  security_group_id        = "${aws_security_group.monitoring_internal_sg.id}"
+  source_security_group_id = "${aws_security_group.monitoring_internal_sg.id}"
+
+  description = "ECS instances can connect to themselves to access CAdvisor"
+}
+
+
 resource "aws_security_group_rule" "monitoring_internal_sg_ingress_int-alb_prometheus-blackbox" {
   type      = "ingress"
   from_port = 9115
